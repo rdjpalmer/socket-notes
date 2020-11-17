@@ -1,21 +1,7 @@
 import { Server, Connection } from "sockjs";
-import { Message, MessageTransformer } from "../types/message";
-import { MessageCache } from "./message-cache";
+import { SocketEvent, MessageEvent, SaveEvent, SerialisedSocketEvent } from "../../../types/SocketEvent";
+import { Message, MessageTransformer } from "../../../types/Message";
 import { Connections } from "./connections";
-
-type SerialisedSocketEvent = "string";
-
-type MessageEvent = {
-  type: "message"
-  value: string;
-}
-
-type SaveEvent = {
-  type: "event",
-  value: "save"
-}
-
-type SocketEvent =  MessageEvent | SaveEvent;
 
 interface Cache {
   add: (message: string) => Message;

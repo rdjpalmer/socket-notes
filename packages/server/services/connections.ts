@@ -1,5 +1,5 @@
 import { Connection } from "sockjs";
-import { Message } from "../types/message";
+import { Message } from "../../../types/Message";
 
 export class Connections {
   connections: Connection[];
