@@ -12,6 +12,7 @@
   "scripts": {
     "start:editor": "yarn workspace @socket-notes/editor start",
     "start:server": "yarn workspace @socket-notes/server start",
-    "start": "concurrently --kill-others-on-fail \"yarn start:server\"  \"yarn start:editor\""
+    "start": "concurrently --kill-others-on-fail \"yarn start:server\"  \"yarn start:editor\"",
+    "serve": "yarn workspace @socket-notes/editor build && yarn workspace @socket-notes/server start"
   }
 }
