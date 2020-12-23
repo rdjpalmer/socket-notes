@@ -1,60 +1,51 @@
 import { Server, Connection } from "sockjs";
-import { SocketEvent, MessageEvent, SaveEvent, SerialisedSocketEvent } from "../../../types/SocketEvent";
-import { Message, MessageTransformer } from "../../../types/Message";
-import { Connections } from "./connections";
+import { SocketEvent, SerialisedSocketEvent } from "../../../types/SocketEvent";
 
-interface Cache {
-  add: (message: string) => Message;
-  last: () => Message;
+type HandleConnection = (connection: Connection) => void;
+type HandleEvent = (event: SocketEvent) => void;
+type HandleClose = (connection: Connection) => void;
+
+interface SocketEventsOptions {
+  handleConnection: HandleConnection;
+  handleEvent: HandleEvent;
+  handleClose: HandleClose;
 }
 
 export class SocketEvents {
   private server: Server;
-  private connections: Connections;
-  private cache: Cache;
-  private transformer: MessageTransformer = (value) => value;
+  private handleConnection: HandleConnection = () => {};
+  private handleEvent: HandleEvent = () => {};
+  private handleClose: HandleClose = () => {};
 
-  constructor(server: Server, connections: Connections, cache: Cache, transformer: MessageTransformer) {
+  constructor(server: Server, options: SocketEventsOptions) {
+    const { handleConnection, handleEvent, handleClose } = options;
+
     this.server = server;
-    this.connections = connections;
-    this.cache = cache;
-    this.transformer = transformer;
+    this.handleConnection = handleConnection;
+    this.handleEvent = handleEvent;
+    this.handleClose = handleClose;
 
-    this.server.on("connection", this.onConnection);
+    this.onData = this.onData.bind(this);
+    this.onClose = this.onClose.bind(this);
+
+    this.server.on("connection", this.onConnection.bind(this));
   }
 
   private onConnection(connection: Connection) {
-    this.connections.add(connection);
-    this.connections.write(this.cache.last())
+    connection.on("data", this.onData.bind(this));
+    connection.on("close", this.onClose.bind(this));
 
-    connection.on("data", this.onData);
-    connection.on("close", this.onClose);
+    this.handleConnection(connection);
+    this.handleEvent({ type: "connect" });
   }
 
   private onData(serialisedEvent: SerialisedSocketEvent) {
     const event: SocketEvent = JSON.parse(serialisedEvent);
 
-    if (event.type === "message") {
-     this.onMessage(event);
-    } else if (event.type === "event") {
-      this.onEvent(event);
-    }
-  }
-
-  private onMessage(event: MessageEvent) {
-    const message = this.transformer(event.value);
-    this.cache.add(message);
-    this.connections.write(this.cache.last());
-  }
-
-  private onEvent(event: SaveEvent) {
-    if (event.value === "save") {
-      // this.diskManager.save(this.cache.last());
-    }
+    this.handleEvent(event);
   }
 
   private onClose(connection: Connection) {
-    this.connections.remove(connection);
-    // save
+    this.handleClose(connection);
   }
 }

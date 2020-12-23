@@ -18,7 +18,6 @@ export default function createServer(props: CreateServerProps): CreateServerRetu
   return new Promise((resolve) => {
     const app = express();
     const server = app.listen(port, hostname, () => {
-      console.log("listening on port 9999")
       sockjsInstance.installHandlers(server, { prefix: sockjsUrl });
       resolve([app, server, sockjsInstance ]);
     });

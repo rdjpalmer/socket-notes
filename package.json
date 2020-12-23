@@ -10,8 +10,8 @@
     "concurrently": "^5.3.0"
   },
   "scripts": {
-    "start:editor": "yarn workspace editor start",
-    "start:server": "yarn workspace server start",
+    "start:editor": "yarn workspace @socket-notes/editor start",
+    "start:server": "yarn workspace @socket-notes/server start",
     "start": "concurrently --kill-others-on-fail \"yarn start:server\"  \"yarn start:editor\""
   }
 }

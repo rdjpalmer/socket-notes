@@ -1,1 +1,110 @@
-hello, world
+<!doctype html>
+<html><head>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 110'%3E%3Ctext y='.9em' font-size='90'%3E 📝 %3C/text%3E%3C/svg%3E%0A" />
+    <title>Viewer | Socket Notes</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <style>
+      body {
+        font-size: 32px;
+        padding-left: 32px;
+        padding-right: 32px;
+        padding-bottom: 32px;
+      }
+
+      div {
+        margin-top: 32px;
+      }
+
+      button {
+        font-size: 32px;
+      }
+
+      .controls > * + * {
+        margin-left: 16px;
+      }
+
+      #container {
+        overflow-y: scroll;
+      }
+    </style>
+    </head>
+    <body>
+      <div id="container">
+        <div class="controls">
+          <button id="reopen-connection" type="button">Reopen connection</button><button id="save" type="button">Save</button><button id="next-page" type="button">Next page</button>
+        </div>
+        <div id="error"></div>
+        <div id="status">Idle.</div>
+        <div id="target"></div>
+      </div>
+    <script>
+      var serverUrl = '/echo';
+      var statusElm = document.getElementById('status');
+      var errorElm = document.getElementById('error');
+      var targetElm = document.getElementById('target');
+      var connectButton = document.getElementById('reopen-connection');
+      var saveButton = document.getElementById('save');
+      var nextButton = document.getElementById('next-page');
+      var connection;
+
+      function connect() {
+        statusElm.innerHTML = "Connecting to " + window.location.origin + serverUrl + "...";
+
+        connection = new SockJS(serverUrl);
+        connection.onopen = handleOpen;
+        connection.onclose = handleClose;
+        connection.onmessage = handleMessage;
+      }
+
+      function save() {
+        connection.send(JSON.stringify({
+          type: "save"
+        }));
+      }
+
+      function next() {
+        connection.send(JSON.stringify({
+          type: "nextPage"
+        }));
+      }
+
+      function handleOpen() {
+        statusElm.innerHTML = "Connected.";
+      }
+
+      function handleClose() {
+        statusElm.innerHTML = "Disconnected.";
+      }
+
+      function handleMessage(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "broadcast") {
+          targetElm.innerHTML = data.value.html;
+        } else if (data.type === "saved") {
+          statusElm.innerHTML = "Saved.";
+
+          setTimeout('statusElm.innerHTML = "Connected."', 1000);
+        }
+      }
+
+      connectButton.onclick = function() {
+        connect();
+      }
+
+      saveButton.onclick = function() {
+        save();
+        statusElm.innerHTML = "Saving...";
+      }
+
+      nextButton.onclick = function() {
+        next();
+      }
+
+      setTimeout('connect()', 300);
+
+      window.onerror = function(error) {
+        errorElm.innerHTML = error;
+      }
+    </script>
+</body></html>

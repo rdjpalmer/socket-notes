@@ -13,7 +13,7 @@ export class Connections {
   }
 
   remove(connection: Connection) {
-    this.connections = this.connections.filter(c => c === connection);
+    this.connections = this.connections.filter(c => c !== connection);
   }
 
   write(message: Message) {

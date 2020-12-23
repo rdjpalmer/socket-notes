@@ -1,10 +1,10 @@
 import path from "path";
-import express, { Application as ExpressApplication } from "express";
+import express from "express";
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+  res.sendFile(path.resolve(__dirname + "/public/index.html"));
 });
 
 export default router;
