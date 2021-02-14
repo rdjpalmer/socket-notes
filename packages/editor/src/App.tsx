@@ -61,27 +61,8 @@ function App() {
     sockets && sockets.send(change.get());
   }
 
-  function handleMouseMove(
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) {
-    const mouseEvent = new ChangeEvent("mousemove", {
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    console.log(mouseEvent.get());
-
-    if (socketStatus === "connected") {
-      console.log(mouseEvent.get());
-      sockets && sockets.send(mouseEvent.get());
-    }
-  }
-
   return (
-    <div
-      className="grid min-h-screen editor-grid"
-      onMouseMove={handleMouseMove}
-    >
+    <div className="grid min-h-screen editor-grid">
       <StatusBar status={socketStatus} />
       <Editor id="editor" value={value} onChange={handleChange} />
     </div>
