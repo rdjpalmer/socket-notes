@@ -1,0 +1,3 @@
+.editor-grid {
+  grid-template-rows: min-content 1fr;
+}

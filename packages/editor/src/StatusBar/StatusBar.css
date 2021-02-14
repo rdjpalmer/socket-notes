@@ -1,0 +1,7 @@
+.statusBar-grid {
+  grid-template-columns: min-content min-content 1fr;
+}
+
+.statusBar-text::first-letter {
+  text-transform: uppercase;
+}
