@@ -94,49 +94,66 @@ async function initialise() {
     );
   }
 
+  function move(coordinates: string) {
+    connections.write(
+      JSON.stringify({
+        type: "broadcastMouse",
+        value: coordinates,
+      })
+    );
+  }
+
   async function handleEvent(event: SocketEvent) {
-    if (event.type === "connect") {
-      broadcast(cache.last());
-    }
+    try {
+      if (event.type === "connect") {
+        broadcast(cache.last());
+      }
 
-    if (event.type === "message") {
-      cache.add(event.value);
-      broadcast(event.value);
-    }
+      if (event.type === "message") {
+        cache.add(event.value);
+        broadcast(event.value);
+      }
 
-    if (event.type === "save") {
-      connections.write(
-        JSON.stringify({
-          type: "saving",
-        })
-      );
+      if (event.type === "mousemove") {
+        move(event.value);
+      }
 
-      await save(cache.last());
-      connections.write(
-        JSON.stringify({
-          type: "saved",
-        })
-      );
-    }
+      if (event.type === "save") {
+        connections.write(
+          JSON.stringify({
+            type: "saving",
+          })
+        );
 
-    if (event.type === "nextPage") {
-      connections.write(
-        JSON.stringify({
-          type: "saving",
-        })
-      );
+        await save(cache.last());
+        connections.write(
+          JSON.stringify({
+            type: "saved",
+          })
+        );
+      }
 
-      await save(cache.last());
+      if (event.type === "nextPage") {
+        connections.write(
+          JSON.stringify({
+            type: "saving",
+          })
+        );
 
-      connections.write(
-        JSON.stringify({
-          type: "saved",
-        })
-      );
+        await save(cache.last());
 
-      // blow away the cache, and the state
-      cache = new MessageCache();
-      broadcast("");
+        connections.write(
+          JSON.stringify({
+            type: "saved",
+          })
+        );
+
+        // blow away the cache, and the state
+        cache = new MessageCache();
+        broadcast("");
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 

@@ -1,5 +1,8 @@
 import { Message } from "./Message";
 
+// "{x: number, y: number}"
+type Coords = string;
+
 export type BroadcastEvent = {
   type: "broadcast";
   value: {
@@ -8,9 +11,19 @@ export type BroadcastEvent = {
   };
 };
 
+export type BroadcastMouseEvent = {
+  type: "broadcastMouse";
+  value: Coords;
+};
+
 export type MessageEvent = {
   type: "message";
   value: Message;
+};
+
+export type MouseEvent = {
+  type: "mousemove";
+  value: Coords;
 };
 
 export type ConnectEvent = {
@@ -36,7 +49,9 @@ export type NextPageEvent = {
 export type SerialisedSocketEvent = string;
 export type SocketEvent =
   | BroadcastEvent
+  | BroadcastMouseEvent
   | MessageEvent
+  | MouseEvent
   | ConnectEvent
   | SaveEvent
   | SavingEvent

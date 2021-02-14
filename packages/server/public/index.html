@@ -26,6 +26,16 @@
       #container {
         overflow-y: scroll;
       }
+
+      #mouse {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        background-color: black;
+        z-index: 100;
+        width: 50px;
+        height: 50px;
+      }
     </style>
     </head>
     <body>
@@ -36,12 +46,16 @@
         <div id="error"></div>
         <div id="status">Idle.</div>
         <div id="target"></div>
+        <div id="example"></div>
+        <div id="mouse"></div>
       </div>
     <script>
       var serverUrl = '/echo';
       var statusElm = document.getElementById('status');
       var errorElm = document.getElementById('error');
       var targetElm = document.getElementById('target');
+      var exampleElm = document.getElementById('example');
+      var mouseElm = document.getElementById('mouse');
       var connectButton = document.getElementById('reopen-connection');
       var saveButton = document.getElementById('save');
       var nextButton = document.getElementById('next-page');
@@ -79,7 +93,11 @@
       function handleMessage(event) {
         const data = JSON.parse(event.data);
 
-        if (data.type === "broadcast") {
+        if (data.type === "broadcastMouse") {
+          mouseElm.style.top = data.value.y + "px";
+          mouseElm.style.left = data.value.x + "px";
+          example.innerHTML = "translate(" + data.value.x + "px," + data.value.y + "px);";
+        } else if (data.type === "broadcast") {
           targetElm.innerHTML = data.value.html;
         } else if (data.type === "saved") {
           statusElm.innerHTML = "Saved.";
